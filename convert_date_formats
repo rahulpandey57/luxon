@@ -1,0 +1,53 @@
+async formateTimezoneDateTime(date: any) {
+        date = date.toISOString().replace(/\.\d{3}Z$/, '');
+        date = new Date(date);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero indexed
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        const seconds = String(date.getSeconds()).padStart(2, '0');
+
+        // Form the desired string in "YYYY-MM-DDTHH:MM" format
+        return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
+    }
+
+async formattedDateTime(date: any) {
+        date = new Date(date);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero indexed
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        const seconds = String(date.getSeconds()).padStart(2, '0');
+
+        // Form the desired string in "YYYY-MM-DDTHH:MM" format
+        return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
+    }
+
+// if we have list of date
+
+async dbDateConvertToTimeZone(input: any, arrayInput: string[], zonename: string) {
+        await CommonHelper.asyncForEach(Object.keys(input), async (inputElement: string) => {
+            // Check if the key needs to be decrypted
+            if (arrayInput.includes(inputElement)) {
+                // console.log("what is type ............", typeof input[inputElement])
+                // If the value associated with the key is an array, check each element recursively
+                if (Array.isArray(input[inputElement])) {
+                    await CommonHelper.asyncForEach(input[inputElement], async (nestedElement: any, index: number) => {
+
+                        if (nestedElement && typeof nestedElement === "object") {
+                            await this.dbDateConvertToTimeZone(nestedElement, arrayInput, zonename);
+                        } else {
+                            input[inputElement][index] = await this.convertToTimeZone(zonename, nestedElement);
+
+                        }
+                    });
+                } else if (input[inputElement] && typeof input[inputElement] === "object") {
+                    await this.dbDateConvertToTimeZone(input[inputElement], arrayInput, zonename);
+                } else {
+                    input[inputElement] = await this.convertToTimeZone(zonename, input[inputElement]);
+                }
+            }
+        });
+    }
