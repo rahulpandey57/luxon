@@ -3,6 +3,7 @@
 [![MIT License][license-image]][license] [![Build Status][github-action-image]][github-action-url] [![NPM version][npm-version-image]][npm-url] [![Coverage Status][test-coverage-image]][test-coverage-url] [![PRs welcome][contributing-image]][contributing-url]
 
 Luxon is a library for working with dates and times in JavaScript.
+If date and time contains timezone like .z you need to convert the data like yyyy-mm-dd and in date time if string format it works more accurate.
 
 ```js
 DateTime.now().setZone("America/New_York").minus({ weeks: 1 }).endOf("day").toISO();
